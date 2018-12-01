@@ -1,144 +1,123 @@
 const fs = require('fs');
-const titulo = 'Clientes';
-const subtitulo = 'Gerenciamento de clientes da loja';
-const icone = 'fas fa-users';
-const add = '/clientes/adicionar/';
-const update = '/clientes/editar/'
+const titulo = 'Fornecedores';
+const subtitulo = 'Gerenciamento de fornecedores para a loja';
+const icone = 'fas fa-tags';
+const url_add = '/fornecedores/adicionar/';
+const url_update = '/fornecedores/editar/';
+const url_list = '/fornecedores/';
+
+const dadosParaPagina = {
+    subtitulo: subtitulo,
+    titulo: titulo,
+    message: '',
+    icone: icone,
+    fornecedores: [],
+    fornecedor: null,
+    action: url_add
+}
 
 module.exports = {
-    listarClientes: (req, res) => {
-
-        console.log("Executar açao de listar todos os usuarios");
-        let query = "SELECT * FROM Clientes";
-        db.query(query, (err, result) => {
-            if (err) {
-                return res.status(500).send(err);
+    listarFornecedor: (req, res) => {
+        console.log("Executar açao de listar todos os fornecedores");
+        let query = "SELECT * FROM Fornecedor";
+        db.query(query, (sql_erro, sql_resultado) => {
+            if (sql_erro){
+                dadosParaPagina.message = sql_erro;
             }
-            res.render('clientes.ejs', {
-                subtitulo: subtitulo,
-                titulo: titulo,
-                message: '',
-                icone: icone,
-                clientes: result,
-                cliente: null,
-                action: add
-            });
+            
+            dadosParaPagina.fornecedores = sql_resultado;
+            dadosParaPagina.action = url_add;
+            dadosParaPagina.message = '';
+            dadosParaPagina.fornecedor = null;
+            res.render('fornecedores.ejs', dadosParaPagina);
         });
     },
 
-    adicionarCliente: (req, res) => {
-        console.log("Executar açao de adicionar novo usuario");
+    adicionarFornecedor: (req, res) => {
+        console.log("Executar açao de adicionar novo fornecedor");
         var message = '';
-        var nome = req.body.nome_cliente;
-        var cpf = req.body.cpf_cliente;
+        var nome = req.body.nome_fornecedor;
+        var telefone = req.body.tel_fornecedor;
         
-        console.log(req.body, nome, cpf);
-
         //get data
         var data = {
-            nome: nome,
-            cpf: cpf
+            Nome: nome,
+            Tel: telefone
         };
-        
-        var insert = "INSERT INTO Clientes set ? "; 
+
+        var insert = "INSERT INTO Fornecedor set ? "; 
         db.query(insert, data, (err, result) => {            
             if (err) {
-                message = "Não foi possivel adicionar o cliente";    
-                res.render('clientes.ejs', {
-                    subtitulo: subtitulo,
-                    titulo: titulo,
-                    message: message,
-                    icone: icone,
-                    clientes: [],
-                    cliente: null,
-                });            
+                message = "Não foi possivel adicionar o fornecedor";    
+                dadosParaPagina.message = message;
+                res.render('clientes.ejs', dadosParaPagina);            
 
             }
             
-            res.redirect('/clientes/');           
+            res.redirect(url_list);           
         });
 
     },
 
-    atualizarCliente: (req, res) => {
-        console.log("Executar açao de editar usuario");
+    atualizarFornecedor: (req, res) => {
+        console.log("Executar açao de editar fornecedor");
+        let id = req.body.id_fornecedor;
         var message = '';
-        var nome = req.body.nome_cliente;
-        var cpf = req.body.cpf_cliente;
+        var nome = req.body.nome_fornecedor;
+        var telefone = req.body.tel_fornecedor;
         
         //get data
         var data = {
-            nome: nome,
-            cpf: cpf
+            Nome: nome,
+            Tel: telefone
         };
         
-        var insert = "UPDATE Clientes set ? WHERE cpf = ? "; 
-        db.query(insert, [data,cpf], (err, result) => {            
-            if (err) {
-                message = "Não foi possivel atualizar o cliente";    
-                res.render('clientes.ejs', {
-                    subtitulo: subtitulo,
-                    titulo: titulo,
-                    message: message,
-                    icone: icone,
-                    clientes: [],
-                    cliente: null,
-                });            
+        var insert = "UPDATE Fornecedor set ? WHERE ID = ? "; 
+        db.query(insert, [data, id], (err, result) => {            
+            if (err) {                
+                message = "Não foi possivel atualizar o fornecedor";    
+                dadosParaPagina.message = message;
+                res.render('fornecedores.ejs', dadosParaPagina);            
 
-            }
-            
-            res.redirect('/clientes/');           
+            }            
+            dadosParaPagina.action = url_add;
+            dadosParaPagina.message = '';            
+            res.redirect(url_list);           
         });
     },
 
-    detalharCliente: (req, res) => {        
-        let cpf = req.params.cpf;        
-        var clientes = [];
-        console.log("Executar açao de editar  usuario CPF=", cpf);
-
-        var query = "SELECT * FROM Clientes";
-        db.query(query, (err, result) => {
-            clientes = result;
-        });
-
-        query = "SELECT * FROM Clientes WHERE CPF="+cpf;
-        db.query(query, (err, result) => {
+    detalharFornecedor: (req, res) => {        
+        console.log("Executar açao de listar o fornecedor selecionado!!!");
+        let id = req.params.id;
+        
+        var query = "SELECT * FROM Fornecedor WHERE ID = "+ id;
+        db.query(query, (err, resultado) => {
             if (err) {
                 return res.status(500).send(err);
             }            
-            res.render('clientes.ejs', {
-                subtitulo: subtitulo,
-                titulo: titulo,
-                message: '',
-                icone: icone,
-                clientes: clientes,
-                cliente: result[0],
-                action: update
-            });
+            dadosParaPagina.fornecedor = resultado[0];
+            dadosParaPagina.action = url_update;       
+            // console.log(dadosParaPagina);
+            res.render('fornecedores.ejs', dadosParaPagina);
         });
     },
     
-    removerCliente: (req, res) => {
-        let cpf = req.params.cpf;        
-        var clientes = [];
-        var message = '';
-        console.log("Executar açao de remover  usuario CPF=", cpf);
-        var insert = "DELETE FROM Clientes  WHERE cpf = ? "; 
-        db.query(insert, [cpf], (err, result) => {            
-            if (err) {
-                message = "Não foi possivel remover o cliente";    
-                res.render('clientes.ejs', {
-                    subtitulo: subtitulo,
-                    titulo: titulo,
-                    message: message,
-                    icone: icone,
-                    clientes: [],
-                    cliente: null,
-                });            
+    removerFornecedor: (req, res) => {
+        /*
+            Para remover o fornecedor é necessario
+        */
+       let id = req.params.id;        
+       console.log("Executar açao de remover fornecedor por ID =", id);
+       
+       var delete_data = "DELETE FROM Fornecedor  WHERE ID = ?"; 
+       db.query(delete_data, [id], (err, result) => {            
+           if (err) {
+               message = "Não foi possivel remover a fornecedor";    
+               dadosParaPagina.message = message;               
+               res.render('fornecedores.ejs', dadosParaPagina);            
 
-            }
-            
-            res.redirect('/clientes/');           
-        });
+           }           
+           res.redirect(url_list);           
+       });
     }
 };

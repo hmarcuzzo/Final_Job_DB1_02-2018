@@ -14,39 +14,45 @@
                             <% } %>
                         <div class="p-3 mt-3">
 
-                           <!-- FORMULARIO PARA ADD CLIENTES -->
+                           <!-- FORMULARIO PARA ADD ESTANCIAS -->
                            <form class="add-player-form" action="<%=action%>" method="post">
                             <div class="form">
                                 <div class="row">
                                     <div class="col-12 col-md-6">
                                         <div class="form-group">
                                             <label>Nome</label>
-                                            <% if(cliente){ %>
-                                                <input type="text" class="form-control" name="nome_cliente" placeholder="Informe o nome do cliente..." 
-                                                value="<%=cliente.Nome%>" charCounter" maxlength="155">
+                                            <% if(estancia){ %>
+                                                <input type="text" class="form-control" name="nome_estancia" placeholder="Informe o nome da estância..." 
+                                                value="<%=estancia.Nome_Estancia%>" charCounter" maxlength="155">
                                               <% } else{ %>  
-                                                <input type="text" class="form-control" name="nome_cliente" placeholder="Informe o nome do cliente..." value="" charCounter" maxlength="155">
+                                                <input type="text" class="form-control" name="nome_estancia" placeholder="Informe o nome do estancia..." value="" charCounter" maxlength="155">
                                              <% } %>   
                                             
                                         </div>
                                     </div>                       
                                     <div class="col-12 col-md-6">
-                                            <div class="form-group"><label>CPF</label>
-                                                <% if(cliente){ %>
-                                                    <input type="number" class="form-control" name="cpf_cliente" placeholder="Informe o CPF do cliente..." 
-                                                value="<%=cliente.CPF%>" charCounter" maxlength="11">
+                                            <div class="form-group"><label>CPF Propietário</label>
+                                                <% if(estancia){ %>
+                                                    <input type="number" class="form-control" name="cpf_propietario" placeholder="Informe o CPF do propietario..." 
+                                                value="<%=estancia.CPF_propietario%>" charCounter" maxlength="11">
                                                   <% } else{ %>  
-                                                    <input type="number" class="form-control" name="cpf_cliente" placeholder="Informe o CPF do cliente..." 
+                                                    <input type="number" class="form-control" name="cpf_propietario" placeholder="Informe o CPF do propietario..." 
                                                 value="" charCounter" maxlength="11">
                                                  <% } %>   
                                                 </div>
                                         </div>
                                         <div class="col-12 col-md-6">
-                                                <div class="form-group">
-                                                    <label>Telefone</label><input type="number" class="form-control" name="tel_cliente" placeholder="Informe o telefone do cliente..." value="" charCounter" maxlength="15">    
-                                                    <i class="fas fa-plus-square mu-2"></i>
-                                                </div>
+                                            <div class="form-group">
+                                                <label>Referência</label>
+                                                <% if(estancia){ %>
+                                                    <input type="text" class="form-control" name="referencia_estancia" placeholder="Informe a referência do local..." 
+                                                    value="<%=estancia.Referencia%>" charCounter" maxlength="155">
+                                                  <% } else{ %>  
+                                                    <input type="text" class="form-control" name="referencia_estancia" placeholder="Informe a referência do local..." value="" charCounter" maxlength="155">
+                                                 <% } %>   
+                                                
                                             </div>
+                                        </div>               
                                     </div>
                                 <hr>
                                 <div class="row">
@@ -59,27 +65,28 @@
                             </div>
                             </form>
 
-                           <!-- LISTAGEM GERAL DE CLIENTES -->
+                           <!-- LISTAGEM GERAL DE ESTANCIAS -->
                            <table class="table mt-5">
                               <thead>
                                  <tr>
                                     <th></th>
-                                    <th>CPF</th>
                                     <th>Nome</th>
-                                    <th>Telefone(s)</th>                                    
+                                    <th>Referência</th>
+                                    <th>Propietário</th>                                    
                                     <th>Ações</th>
                                  </tr>
                               </thead>
                               <tbody>
-                                    <% clientes.forEach(function(cliente){ %>
+                                    <% estancias.forEach(function(estancia){ %>
                                         <tr>                                            
                                             <td><i class="fas fa-users"></i></td>
-                                            <td><%= cliente.CPF %></td>
-                                            <td><%= cliente.Nome %></td>                                            
-                                            <td>X</td>                                            
+                                            <td><%= estancia.Nome_Estancia %></td> 
+                                            <td><%= estancia.Referencia %></td>
+                                            <td><%= estancia.CPF_propietario %></td>                                           
+                                                                                                                                  
                                             <td>
-                                                <a href="/clientes/editar/<%=cliente.CPF%>" class="btn btn-sm btn-primary">Editar</a>
-                                                <a href="/clientes/remover/<%=cliente.CPF%>" class="btn btn-sm btn-danger">Remover</a>
+                                                <a href="/estancia/editar/<%=estancia.CPF_propietario%>" class="btn btn-sm btn-primary">Editar</a>
+                                                <a href="/estancia/remover/<%=estancia.CPF_propietario%>" class="btn btn-sm btn-danger">Remover</a>
                                             </td>
                                         </tr>
                                     <% }); %>

@@ -20,43 +20,68 @@
                                 <div class="row">
                                     <div class="col-12 col-md-6">
                                         <div class="form-group">
-                                            <label>Nome</label>
-                                            <% if(cliente){ %>
-                                                <input type="text" class="form-control" name="nome_cliente" placeholder="Informe o nome do cliente..." 
-                                                value="<%=cliente.Nome%>" charCounter" maxlength="155">
-                                              <% } else{ %>  
-                                                <input type="text" class="form-control" name="nome_cliente" placeholder="Informe o nome do cliente..." value="" charCounter" maxlength="155">
-                                             <% } %>   
-                                            
-                                        </div>
-                                    </div>                       
-                                    <div class="col-12 col-md-6">
-                                            <div class="form-group"><label>CPF</label>
-                                                <% if(cliente){ %>
-                                                    <input type="number" class="form-control" name="cpf_cliente" placeholder="Informe o CPF do cliente..." 
-                                                value="<%=cliente.CPF%>" charCounter" maxlength="11">
-                                                  <% } else{ %>  
-                                                    <input type="number" class="form-control" name="cpf_cliente" placeholder="Informe o CPF do cliente..." 
-                                                value="" charCounter" maxlength="11">
-                                                 <% } %>   
-                                                </div>
+                                            <label>Categoria</label>
+                                            <input type="number" class="form-control" name="cat_prod" 
+                                            placeholder="Informe a categoria do produto..." 
+                                            value="" maxlength="6"></div>
                                         </div>
                                         <div class="col-12 col-md-6">
-                                                <div class="form-group">
-                                                    <label>Telefone</label><input type="number" class="form-control" name="tel_cliente" placeholder="Informe o telefone do cliente..." value="" charCounter" maxlength="15">    
-                                                    <i class="fas fa-plus-square mu-2"></i>
-                                                </div>
-                                            </div>
+                                        <div class="form-group">
+                                            <label>Fornecedor</label>
+                                            <input type="number" class="form-control" name="fornecedor" 
+                                             placeholder="Informe o ID do fornecedor do produto..."
+                                             value="" maxlength="6">
+                                        </div>
                                     </div>
-                                <hr>
-                                <div class="row">
-                                    <div class="col-12 d-flex justify-content-end">
-                                        <button class="btn btn-success ml-2">Pesquisar</button>
-                                        <button class="btn btn-primary ml-2" type="submit" onclick="submitForm()">Salvar</button>                                        
-                                        <button class="btn ml-2">Limpar</button>
+                                   <div class="col-12 col-md-6">
+                                      <div class="form-group">
+                                          <label>Código</label>
+                                          <input type="number" class="form-control" name="cod_prod" placeholder="Informe o código de barras do produto..." 
+                                           value="" required maxlength="6">
+                                        </div>
+                                   </div>
+                                   <div class="col-12 col-md-6">
+                                       <div class="form-group">
+                                           <label>Nome</label>
+                                           <input type="text" class="form-control" name="nome_prod" placeholder="Informe o nome do produto..." 
+                                           value="" required maxlength="155"> 
+                                        </div>
+                                    </div>
+                                   <div class="col-12 col-md-6">
+                                      <div class="form-group">
+                                          <label>Descrição</label>
+                                          <input type="text" class="form-control" name="desc_prod" 
+                                          placeholder="Descreva o produto..." 
+                                          value="" required maxlength="255">
+                                        </div>
+                                   </div>
+                                   <div class="col-12 col-md-6">
+                                       <div class="form-group">
+                                           <label>Preço</label>
+                                           <input type="number" class="form-control" name="preco_prod" 
+                                           placeholder="Informe o preço do produto em BRL..." 
+                                           value="">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-12 col-md-6">
+                                       <div class="form-group">
+                                           <label>Estoque</label>
+                                           <input type="number" class="form-control" name="estoque" 
+                                           placeholder="Informe a quantidade em estoque..." 
+                                           value="">
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                                <hr>
+                                <div class="row">
+                                   <div class="col-12 d-flex justify-content-end">
+                                       <button class="btn btn-success ml-2">Pesquisar</button>
+                                       <button class="btn btn-primary ml-2">Adicionar</button>
+                                       <button class="btn btn-danger ml-2">Cancelar</button>
+                                   </div>
+                                </div>
+                             </div>
                             </form>
 
                            <!-- LISTAGEM GERAL DE CLIENTES -->
@@ -64,22 +89,30 @@
                               <thead>
                                  <tr>
                                     <th></th>
-                                    <th>CPF</th>
+                                    <th>Codigo</th>
                                     <th>Nome</th>
-                                    <th>Telefone(s)</th>                                    
+                                    <th>Descrição</th>
+                                    <th>Preço</th>
+                                    <th>Categoria</th>
+                                    <th>Fornecedor</th>
+                                    <th>Estoque</th>
                                     <th>Ações</th>
                                  </tr>
                               </thead>
                               <tbody>
-                                    <% clientes.forEach(function(cliente){ %>
+                                    <% produtos.forEach(function(produto){ %>
                                         <tr>                                            
                                             <td><i class="fas fa-users"></i></td>
-                                            <td><%= cliente.CPF %></td>
-                                            <td><%= cliente.Nome %></td>                                            
-                                            <td>X</td>                                            
+                                            <td><%= produto.Codigo %></td>
+                                            <td><%= produto.Nome %></td>                                            
+                                            <td><%= produto.Descricao %></td>  
+                                            <td><%= produto.Preco %></td>
+                                            <td><%= produto.ID_categoria %></td>
+                                            <td><%= produto.ID_fornecedor %></td>
+                                            <td><%= produto.QTD_Estoque %></td>                                       
                                             <td>
-                                                <a href="/clientes/editar/<%=cliente.CPF%>" class="btn btn-sm btn-primary">Editar</a>
-                                                <a href="/clientes/remover/<%=cliente.CPF%>" class="btn btn-sm btn-danger">Remover</a>
+                                                <a href="/produtos/editar/<%=produto.Codigo%>" class="btn btn-sm btn-primary">Editar</a>
+                                                <a href="/produtos/remover/<%=produto.Codigo%>" class="btn btn-sm btn-danger">Remover</a>
                                             </td>
                                         </tr>
                                     <% }); %>

@@ -21,32 +21,28 @@
                                     <div class="col-12 col-md-6">
                                         <div class="form-group">
                                             <label>Nome</label>
-                                            <% if(cliente){ %>
-                                                <input type="text" class="form-control" name="nome_cliente" placeholder="Informe o nome do cliente..." 
-                                                value="<%=cliente.Nome%>" charCounter" maxlength="155">
-                                              <% } else{ %>  
-                                                <input type="text" class="form-control" name="nome_cliente" placeholder="Informe o nome do cliente..." value="" charCounter" maxlength="155">
+                                            <% if(categoria){ %>
+                                                <input type="hidden" name="id_categoria" id="id_categoria" value="<%=categoria.ID%>"/>
+                                                <input type="text" class="form-control" name="nome_categoria" placeholder="Informe o Nome da Categoria..." 
+                                                value="<%=categoria.Nome%>" charCounter maxlength="155">
+                                              <% } else{ %>
+                                                <input type="text" class="form-control" name="nome_categoria" placeholder="Informe o Nome da Categoria..."
+                                                 value="" charCounter maxlength="155">
                                              <% } %>   
                                             
                                         </div>
                                     </div>                       
                                     <div class="col-12 col-md-6">
-                                            <div class="form-group"><label>CPF</label>
-                                                <% if(cliente){ %>
-                                                    <input type="number" class="form-control" name="cpf_cliente" placeholder="Informe o CPF do cliente..." 
-                                                value="<%=cliente.CPF%>" charCounter" maxlength="11">
+                                            <div class="form-group"><label>Descrição</label>
+                                                <% if(categoria){ %>
+                                                    <input type="text" class="form-control" name="descricao_categoria" placeholder="Informe a Descrição da Categoria..." 
+                                                    value="<%=categoria.Descricao%>" charCounter maxlength="255">
                                                   <% } else{ %>  
-                                                    <input type="number" class="form-control" name="cpf_cliente" placeholder="Informe o CPF do cliente..." 
-                                                value="" charCounter" maxlength="11">
+                                                    <input type="text" class="form-control" name="descricao_categoria" placeholder="Informe a Descrição da Categoria..." 
+                                                    value="" charCounter maxlength="255">
                                                  <% } %>   
                                                 </div>
                                         </div>
-                                        <div class="col-12 col-md-6">
-                                                <div class="form-group">
-                                                    <label>Telefone</label><input type="number" class="form-control" name="tel_cliente" placeholder="Informe o telefone do cliente..." value="" charCounter" maxlength="15">    
-                                                    <i class="fas fa-plus-square mu-2"></i>
-                                                </div>
-                                            </div>
                                     </div>
                                 <hr>
                                 <div class="row">
@@ -64,22 +60,22 @@
                               <thead>
                                  <tr>
                                     <th></th>
-                                    <th>CPF</th>
+                                    <th>ID</th>
                                     <th>Nome</th>
-                                    <th>Telefone(s)</th>                                    
+                                    <th>Descrição</th>                                    
                                     <th>Ações</th>
                                  </tr>
                               </thead>
                               <tbody>
-                                    <% clientes.forEach(function(cliente){ %>
+                                    <% categorias.forEach(function(categoria){ %>
                                         <tr>                                            
                                             <td><i class="fas fa-users"></i></td>
-                                            <td><%= cliente.CPF %></td>
-                                            <td><%= cliente.Nome %></td>                                            
-                                            <td>X</td>                                            
+                                            <td><%= categoria.ID %></td>
+                                            <td><%= categoria.Nome %></td>                                            
+                                            <td><%= categoria.Descricao %></td>                                            
                                             <td>
-                                                <a href="/clientes/editar/<%=cliente.CPF%>" class="btn btn-sm btn-primary">Editar</a>
-                                                <a href="/clientes/remover/<%=cliente.CPF%>" class="btn btn-sm btn-danger">Remover</a>
+                                                <a href="/categorias/editar/<%=categoria.ID%>" class="btn btn-sm btn-primary">Editar</a>
+                                                <a href="/categorias/remover/<%=categoria.ID%>" class="btn btn-sm btn-danger">Remover</a>
                                             </td>
                                         </tr>
                                     <% }); %>
@@ -96,7 +92,7 @@
 
         <script>
                
-                function submitForm() {
+                function submitForm() {                    
                     document.contact-form.submit();
                     document.contact-form.reset();
                 }

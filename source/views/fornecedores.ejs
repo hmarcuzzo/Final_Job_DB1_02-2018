@@ -21,30 +21,24 @@
                                     <div class="col-12 col-md-6">
                                         <div class="form-group">
                                             <label>Nome</label>
-                                            <% if(cliente){ %>
-                                                <input type="text" class="form-control" name="nome_cliente" placeholder="Informe o nome do cliente..." 
-                                                value="<%=cliente.Nome%>" charCounter" maxlength="155">
+                                            <% if(fornecedor){ %>
+                                                <input type="hidden" name="id_fornecedor" id="id_fornecedor" value="<%=fornecedor.ID%>"/>
+                                                <input type="text" class="form-control" name="nome_fornecedor" placeholder="Informe o nome do fornecedor..." 
+                                                value="<%=fornecedor.Nome%>" charCounter maxlength="155">
                                               <% } else{ %>  
-                                                <input type="text" class="form-control" name="nome_cliente" placeholder="Informe o nome do cliente..." value="" charCounter" maxlength="155">
+                                                <input type="text" class="form-control" name="nome_fornecedor" placeholder="Informe o nome do fornecedor..." value="" charCounter maxlength="155">
                                              <% } %>   
                                             
                                         </div>
-                                    </div>                       
-                                    <div class="col-12 col-md-6">
-                                            <div class="form-group"><label>CPF</label>
-                                                <% if(cliente){ %>
-                                                    <input type="number" class="form-control" name="cpf_cliente" placeholder="Informe o CPF do cliente..." 
-                                                value="<%=cliente.CPF%>" charCounter" maxlength="11">
-                                                  <% } else{ %>  
-                                                    <input type="number" class="form-control" name="cpf_cliente" placeholder="Informe o CPF do cliente..." 
-                                                value="" charCounter" maxlength="11">
-                                                 <% } %>   
-                                                </div>
-                                        </div>
+                                    </div>                                                           
                                         <div class="col-12 col-md-6">
                                                 <div class="form-group">
-                                                    <label>Telefone</label><input type="number" class="form-control" name="tel_cliente" placeholder="Informe o telefone do cliente..." value="" charCounter" maxlength="15">    
-                                                    <i class="fas fa-plus-square mu-2"></i>
+                                                    <label>Telefone</label>
+                                                    <% if(fornecedor){ %>
+                                                        <input type="number" class="form-control" name="tel_fornecedor" placeholder="Informe o telefone do cliente..." value="<%=fornecedor.Tel%>" charCounter maxlength="15">                                                       
+                                                    <% } else{ %>
+                                                        <input type="number" class="form-control" name="tel_fornecedor" placeholder="Informe o telefone do cliente..." value="" charCounter maxlength="15">                                                       
+                                                    <% } %>
                                                 </div>
                                             </div>
                                     </div>
@@ -64,22 +58,22 @@
                               <thead>
                                  <tr>
                                     <th></th>
-                                    <th>CPF</th>
+                                    <th>ID</th>
                                     <th>Nome</th>
-                                    <th>Telefone(s)</th>                                    
+                                    <th>Telefone</th>                                    
                                     <th>Ações</th>
                                  </tr>
                               </thead>
                               <tbody>
-                                    <% clientes.forEach(function(cliente){ %>
+                                    <% fornecedores.forEach(function(fornecedor){ %>
                                         <tr>                                            
                                             <td><i class="fas fa-users"></i></td>
-                                            <td><%= cliente.CPF %></td>
-                                            <td><%= cliente.Nome %></td>                                            
-                                            <td>X</td>                                            
+                                            <td><%= fornecedor.ID %></td>
+                                            <td><%= fornecedor.Nome %></td>
+                                            <td><%= fornecedor.Tel %></td>                                                                                        
                                             <td>
-                                                <a href="/clientes/editar/<%=cliente.CPF%>" class="btn btn-sm btn-primary">Editar</a>
-                                                <a href="/clientes/remover/<%=cliente.CPF%>" class="btn btn-sm btn-danger">Remover</a>
+                                                <a href="/fornecedores/editar/<%=fornecedor.ID%>" class="btn btn-sm btn-primary">Editar</a>
+                                                <a href="/fornecedores/remover/<%=fornecedor.ID%>" class="btn btn-sm btn-danger">Remover</a>
                                             </td>
                                         </tr>
                                     <% }); %>
