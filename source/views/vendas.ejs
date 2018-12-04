@@ -1,105 +1,308 @@
 <!doctype html>
 <html lang="en">
-        <% include partials/header.ejs %>
-<body>
-        <div id="root"> 
-            <div class="app">
-                <% include partials/menu.ejs %>
-               
-                <!--- INICIO DO CONTEUDO DA PAGINA -->
-                <main class="content container-fluid">
-                        <% if (message != '') { %>
-                            <p class="text-center text-danger"><%= message %></p>
-                        
-                            <% } %>
-                        <div class="p-3 mt-3">
+<% include partials/header.ejs %>
 
-                           <!-- FORMULARIO PARA ADD CLIENTES -->
-                           <form class="add-player-form" action="<%=action%>" method="post">
-                            <div class="form">
-                                <div class="row">
-                                    <div class="col-12 col-md-6">
-                                        <div class="form-group">
-                                            <label>Nome</label>
-                                            <% if(cliente){ %>
-                                                <input type="text" class="form-control" name="nome_cliente" placeholder="Informe o nome do cliente..." 
-                                                value="<%=cliente.Nome%>" charCounter" maxlength="155">
-                                              <% } else{ %>  
-                                                <input type="text" class="form-control" name="nome_cliente" placeholder="Informe o nome do cliente..." value="" charCounter" maxlength="155">
-                                             <% } %>   
-                                            
-                                        </div>
-                                    </div>                       
-                                    <div class="col-12 col-md-6">
-                                            <div class="form-group"><label>CPF</label>
-                                                <% if(cliente){ %>
-                                                    <input type="number" class="form-control" name="cpf_cliente" placeholder="Informe o CPF do cliente..." 
-                                                value="<%=cliente.CPF%>" charCounter" maxlength="11">
-                                                  <% } else{ %>  
-                                                    <input type="number" class="form-control" name="cpf_cliente" placeholder="Informe o CPF do cliente..." 
-                                                value="" charCounter" maxlength="11">
-                                                 <% } %>   
-                                                </div>
-                                        </div>
-                                        <div class="col-12 col-md-6">
-                                                <div class="form-group">
-                                                    <label>Telefone</label><input type="number" class="form-control" name="tel_cliente" placeholder="Informe o telefone do cliente..." value="" charCounter" maxlength="15">    
-                                                    <i class="fas fa-plus-square mu-2"></i>
-                                                </div>
-                                            </div>
-                                    </div>
-                                <hr>
-                                <div class="row">
-                                    <div class="col-12 d-flex justify-content-end">
-                                        <button class="btn btn-success ml-2">Pesquisar</button>
-                                        <button class="btn btn-primary ml-2" type="submit" onclick="submitForm()">Salvar</button>                                        
-                                        <button class="btn ml-2">Limpar</button>
-                                    </div>
+<script>
+    function calcularTotal(codigo) {
+        var preco_label = "produto_preco_" + codigo;
+        var qtde_label = "produto_qtde_" + codigo;
+        var estoque_label = "produto_estoque_" + codigo;
+        var total_label = "produto_total_" + codigo;
+
+        var preco = document.getElementById(preco_label).textContent;
+        var qtde = document.getElementById(qtde_label).value;
+        var estoque = document.getElementById(estoque_label).textContent;
+        var total = document.getElementById(total_label);
+
+        var resultado = parseFloat(preco) * parseInt(qtde);
+        total.textContent = resultado;
+
+        var tr_label = "produto_" + codigo;
+        var dataset = document.getElementById(tr_label).dataset;
+        dataset.total = resultado;
+        dataset.qtde = qtde;
+
+        var labelTotal = document.getElementById("total_produtos");
+        var labelTotalCompra = document.getElementById("total_compra");
+        var produtos = document.getElementsByClassName("table-success");
+        labelTotal.textContent = produtos.length;
+        var totalCompra = 0;
+
+        for (var i = 0; i < produtos.length; i++) {
+            totalCompra += parseFloat(produtos[i].dataset.total);
+        }
+        labelTotalCompra.textContent = totalCompra;
+    }
+
+    function addProduto(codigo) {
+        console.log("Adicionando " + codigo);
+
+        var tr_label = "produto_" + codigo;
+        var tr = $('#' + tr_label);
+        tr.addClass("table-success");
+        tr.removeClass("table-light");
+
+        var tr = document.getElementById(tr_label);
+        tr.dataset.selecionada = 1;
+        calcularTotal(codigo);
+    }
+
+    function removeProduto(codigo) {
+        console.log("Adicionando " + codigo);
+
+        var tr_label = "produto_" + codigo;
+        var tr = $('#' + tr_label);
+        tr.addClass("table-light");
+        tr.removeClass("table-success");
+
+        var total = 0;
+        var labelTotal = document.getElementById("total_produtos");
+        $(".table-success").each(function (index) {
+            total += 1;
+
+        });
+        labelTotal.textContent = total;
+
+        var tr = document.getElementById(tr_label);
+        tr.dataset.selecionada = 0;
+        calcularTotal(codigo);
+    }
+
+    function submitForm() {
+        console.log("ENVIAR PRA SALVAR");
+        
+        var produtos = document.getElementsByClassName("table-success");
+        for (var i = 0; i < produtos.length; i++) {
+            codigo = produtos[i].dataset.codigo;
+            $('<input>').attr({
+                type: 'hidden',
+                id: 'produtos',
+                name: 'produtos',
+                value: codigo
+            }).appendTo('form');
+
+            $('<input>').attr({
+                type: 'hidden',
+                id: 'qtde_produto_'+codigo,
+                name: 'qtde_produto_'+codigo,
+                value: produtos[i].dataset.qtde
+            }).appendTo('form');
+        }
+    }
+</script>
+
+<body>
+    <div id="root">
+        <div class="app">
+            <% include partials/menu.ejs %>
+
+            <!--- INICIO DO CONTEUDO DA PAGINA -->
+
+            <main class="content container-fluid">
+
+                <div class="p-3 mt-3">
+
+                    <!-- INICIO DO FORMULARIO PARA ADD/UPDATE DADOS -->
+                    <div class="container">
+                        <!--- INICIO DA AREA RESERVADA PARA MENSAGENS -->
+                        <% if (message_erro) { %>
+                        <div class="alert alert-danger" role="alert">
+                            <%= message_erro %>
+                        </div>
+                        <% } %>
+
+                        <% if (message_sucesso) { %>
+                        <div class="alert alert-success" role="alert">
+                            <%= message_sucesso %>
+                        </div>
+                        <% } %>
+                        <!--- FIM DA AREA RESERVADA PARA MENSAGENS -->
+
+                        <form action="<%=action%>" method="post">
+
+                            <div class="form-group row">
+                                <div class="col-12 d-flex justify-content-end">
+                                    <button class="btn btn-primary ml-2" type="submit" onclick="submitForm()">
+                                        Realizar venda
+                                    </button>
+                                    <button class="btn ml-2">
+                                        Limpar
+                                    </button>
                                 </div>
                             </div>
-                            </form>
 
-                           <!-- LISTAGEM GERAL DE CLIENTES -->
-                           <table class="table mt-5">
-                              <thead>
-                                 <tr>
-                                    <th></th>
-                                    <th>CPF</th>
-                                    <th>Nome</th>
-                                    <th>Telefone(s)</th>                                    
-                                    <th>Ações</th>
-                                 </tr>
-                              </thead>
-                              <tbody>
-                                    <% clientes.forEach(function(cliente){ %>
-                                        <tr>                                            
-                                            <td><i class="fas fa-users"></i></td>
-                                            <td><%= cliente.CPF %></td>
-                                            <td><%= cliente.Nome %></td>                                            
-                                            <td>X</td>                                            
-                                            <td>
-                                                <a href="/clientes/editar/<%=cliente.CPF%>" class="btn btn-sm btn-primary">Editar</a>
-                                                <a href="/clientes/remover/<%=cliente.CPF%>" class="btn btn-sm btn-danger">Remover</a>
-                                            </td>
-                                        </tr>
-                                    <% }); %>
-                              </tbody>
-                           </table>
-                        </div>
-                     </main>
+                            <div class="form-group row">
+                                <label for="codigo_venda" class="col-sm-3 col-form-label">Código da venda</label>
+                                <div class="col-sm-9">
+                                    <% if(venda){ %>
+                                    <input type="number" class="form-control" id="codigo_venda" name="codigo_venda" readonly value="<%=venda.Codigo%>">
+                                    <% } else{ %>
+                                    <input type="number" class="form-control" id="codigo_venda" name="codigo_venda" readonly value="">
+                                    <% } %>
+                                </div>
+                            </div>
 
-                <!-- FIM DO CONTEUDO DA PAGINA -->
-                
-                <% include partials/footer.ejs %>
-            </div>
+                            <div class="form-group row">
+                                <label for="data_venda" class="col-sm-3 col-form-label">Data da venda</label>
+                                <div class="col-sm-9">
+                                    <% if(venda){ %>
+                                    <input type="date" class="form-control" id="data_venda" name="data_venda" value="<%=venda.Dia_venda%>"
+                                        placeholder="Digite no formato dd-mm-yyyy">
+                                    <% } else{ %>
+                                    <input type="date" class="form-control" id="data_venda" name="data_venda" value="2018-12-04"
+                                        placeholder="Digite no formato dd-mm-yyyy">
+                                    <% } %>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label for="clientes" class="col-sm-3 col-form-label">
+                                    Selecione cliente
+                                </label>
+                                <div class="col-sm-9">
+                                    <select class="form-control" id="clientes" name="clientes">
+                                        <% clientes.forEach(function(cliente){ %>
+                                        <option value="<%= cliente.CPF %>">
+                                            <%= cliente.Nome %>
+                                        </option>
+                                        <% }); %>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label for="atendentes" class="col-sm-3 col-form-label">
+                                    Selecione atendente
+                                </label>
+                                <div class="col-sm-9">
+                                    <select class="form-control" id="atendentes" name="atendentes">
+                                        <% atendentes.forEach(function(atendente){ %>
+                                        <option value="<%= atendente.CPF %>">
+                                            <%= atendente.Nome %>
+                                        </option>
+                                        <% }); %>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label for="freteiros" class="col-sm-3 col-form-label">
+                                    Selecione o freteiro
+                                </label>
+                                <div class="col-sm-9">
+                                    <select class="form-control" id="freteiros" name="freteiros">
+                                        <% freteiros.forEach(function(freteiro){ %>
+                                        <option value="<%= freteiro.CPF %>">
+                                            <%= freteiro.Nome %>
+                                        </option>
+                                        <% }); %>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+
+                                <div class="card">
+                                    <div class="card-header">
+                                        Resumo da venda
+                                    </div>
+                                    <ul class="list-group list-group-flush">
+                                        <li class="list-group-item">
+                                            <strong>Valor total dos produtos: </strong>
+                                            R$ <label id="total_compra">000.00</label>
+                                        </li>
+                                        <li class="list-group-item">
+                                            <strong>Qtde de produtos selecionados: </strong>
+                                            <label id="total_produtos">00</label>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <div class="form-group">
+                                    <table class="table  mt-15">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">Código</th>
+                                                <th scope="col">Produto</th>
+                                                <th scope="col">Categoria</th>
+                                                <th scope="col">Fornecedor</th>
+                                                <th scope="col">Preço</th>
+                                                <th scope="col">Estoque</th>
+                                                <th scope="col">Qtde a comprar</th>
+                                                <th scope="col">Total</th>
+                                                <th scope="col">Ação </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <% produtos.forEach(function(produto){ %>
+                                            <tr id="produto_<%=produto.Codigo%>" data-codigo="<%=produto.Codigo%>"
+                                                data-estoque="<%=produto.QTD_Estoque%>" data-preco="<%=produto.Preco%>"
+                                                data-qtde="0" data-total="0.0" data-selecionado="0">
+                                                <th scope="row">
+                                                    <img class="card-img-top" src="/assets/images/buy.png" alt="Icone do produto">
+                                                    <%=produto.Codigo%>
+                                                </th>
+                                                <td>
+                                                    <%=produto.Nome%>
+                                                </td>
+                                                <td>
+                                                    <%=produto.Nome_Categoria%>
+                                                </td>
+                                                <td>
+                                                    <%=produto.Nome_Fornecedor%>
+                                                </td>
+                                                <td id="produto_preco_<%=produto.Codigo%>">
+                                                    <%=produto.Preco%>
+                                                </td>
+                                                <td id="produto_estoque_<%=produto.Codigo%>">
+                                                    <%=produto.QTD_Estoque%>
+                                                </td>
+                                                <td>
+                                                    <input type="number" id="produto_qtde_<%=produto.Codigo%>" value="1"
+                                                        class="produtos" min="1" max="<%=produto.QTD_Estoque%>"
+                                                        onchange="calcularTotal('<%=produto.Codigo%>')">
+                                                </td>
+                                                <td id="produto_total_<%=produto.Codigo%>">
+                                                    <%=produto.Preco%>
+                                                </td>
+                                                <td>
+                                                    <a href="#" data-name="produto 1" data-price="0.5" class="btn btn-sm btn-info"
+                                                        onclick="addProduto('<%=produto.Codigo%>')">
+                                                        <i class="fas fa-cart-plus"></i>
+                                                    </a>
+                                                    <a href="#" onclick="removeProduto('<%=produto.Codigo%>')" class="btn btn-sm btn-danger">
+                                                        <i class="fas fa-trash"></i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                            <% }); %>
+
+
+                                        </tbody>
+                                    </table>
+                                </div>
+
+
+                            </div>
+
+
+
+                        </form>
+                    </div>
+                    <!-- FIM DO FORMULARIO PARA ADD/UPDATE DADOS -->
+
+                </div>
+            </main>
+
+            <hr />
+
+            <!-- FIM DO CONTEUDO DA PAGINA -->
+
+            <% include partials/footer.ejs %>
         </div>
+    </div>
 
-        <script>
-               
-                function submitForm() {
-                    document.contact-form.submit();
-                    document.contact-form.reset();
-                }
-            </script>
+
 </body>
+
 </html>

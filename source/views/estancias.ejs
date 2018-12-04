@@ -1,112 +1,145 @@
 <!doctype html>
 <html lang="en">
-        <% include partials/header.ejs %>
-<body>
-        <div id="root"> 
-            <div class="app">
-                <% include partials/menu.ejs %>
-               
-                <!--- INICIO DO CONTEUDO DA PAGINA -->
-                <main class="content container-fluid">
-                        <% if (message != '') { %>
-                            <p class="text-center text-danger"><%= message %></p>
-                        
-                            <% } %>
-                        <div class="p-3 mt-3">
+<% include partials/header.ejs %>
+<script>
+    function submitForm() {
+        form.submit();
+        form.reset();
+    }
+</script>
 
-                           <!-- FORMULARIO PARA ADD ESTANCIAS -->
-                           <form class="add-player-form" action="<%=action%>" method="post">
-                            <div class="form">
-                                <div class="row">
-                                    <div class="col-12 col-md-6">
-                                        <div class="form-group">
-                                            <label>Nome</label>
-                                            <% if(estancia){ %>
-                                                <input type="text" class="form-control" name="nome_estancia" placeholder="Informe o nome da estância..." 
-                                                value="<%=estancia.Nome_Estancia%>" charCounter" maxlength="155">
-                                              <% } else{ %>  
-                                                <input type="text" class="form-control" name="nome_estancia" placeholder="Informe o nome do estancia..." value="" charCounter" maxlength="155">
-                                             <% } %>   
-                                            
-                                        </div>
-                                    </div>                       
-                                    <div class="col-12 col-md-6">
-                                            <div class="form-group"><label>CPF Propietário</label>
-                                                <% if(estancia){ %>
-                                                    <input type="number" class="form-control" name="cpf_propietario" placeholder="Informe o CPF do propietario..." 
-                                                value="<%=estancia.CPF_propietario%>" charCounter" maxlength="11">
-                                                  <% } else{ %>  
-                                                    <input type="number" class="form-control" name="cpf_propietario" placeholder="Informe o CPF do propietario..." 
-                                                value="" charCounter" maxlength="11">
-                                                 <% } %>   
-                                                </div>
-                                        </div>
-                                        <div class="col-12 col-md-6">
-                                            <div class="form-group">
-                                                <label>Referência</label>
-                                                <% if(estancia){ %>
-                                                    <input type="text" class="form-control" name="referencia_estancia" placeholder="Informe a referência do local..." 
-                                                    value="<%=estancia.Referencia%>" charCounter" maxlength="155">
-                                                  <% } else{ %>  
-                                                    <input type="text" class="form-control" name="referencia_estancia" placeholder="Informe a referência do local..." value="" charCounter" maxlength="155">
-                                                 <% } %>   
-                                                
-                                            </div>
-                                        </div>               
-                                    </div>
-                                <hr>
-                                <div class="row">
-                                    <div class="col-12 d-flex justify-content-end">
-                                        <button class="btn btn-success ml-2">Pesquisar</button>
-                                        <button class="btn btn-primary ml-2" type="submit" onclick="submitForm()">Salvar</button>                                        
-                                        <button class="btn ml-2">Limpar</button>
-                                    </div>
+<body>
+    <div id="root">
+        <div class="app">
+            <% include partials/menu.ejs %>
+
+            <!--- INICIO DO CONTEUDO CUSTOMIZADO DA PAGINA -->
+            <main class="content container-fluid">
+                <div class="p-3 mt-3">
+                    <div class="container">
+                        <!--- INICIO DA AREA RESERVADA PARA MENSAGENS -->
+                        <% if (message_erro) { %>
+                        <div class="alert alert-danger" role="alert">
+                            <%= message_erro %>
+                        </div>
+                        <% } %>
+
+                        <% if (message_sucesso) { %>
+                        <div class="alert alert-success" role="alert">
+                            <%= message_sucesso %>
+                        </div>
+                        <% } %>
+                        <!--- FIM DA AREA RESERVADA PARA MENSAGENS -->
+
+                        <!-- INICIO DO FORMULARIO PARA ADD/UPDATE DADOS -->
+                        <form action="<%=action%>" method="post">
+                            <div class="form-group row">
+                                <label for="codigo_estancia" class="col-sm-2 col-form-label">Código</label>
+                                <div class="col-sm-10">
+                                    <% if(estancia){ %>
+                                    <input type="number" class="form-control" name="codigo_estancia" readonly value="<%=estancia.Codigo%>">
+                                    <% } else{ %>
+                                    <input type="number" class="form-control" name="codigo_estancia" readonly value="">
+                                    <% } %>
                                 </div>
                             </div>
-                            </form>
 
-                           <!-- LISTAGEM GERAL DE ESTANCIAS -->
-                           <table class="table mt-5">
-                              <thead>
-                                 <tr>
-                                    <th></th>
-                                    <th>Nome</th>
-                                    <th>Referência</th>
-                                    <th>Propietário</th>                                    
-                                    <th>Ações</th>
-                                 </tr>
-                              </thead>
-                              <tbody>
-                                    <% estancias.forEach(function(estancia){ %>
-                                        <tr>                                            
-                                            <td><i class="fas fa-users"></i></td>
-                                            <td><%= estancia.Nome_Estancia %></td> 
-                                            <td><%= estancia.Referencia %></td>
-                                            <td><%= estancia.CPF_propietario %></td>                                           
-                                                                                                                                  
-                                            <td>
-                                                <a href="/estancia/editar/<%=estancia.CPF_propietario%>" class="btn btn-sm btn-primary">Editar</a>
-                                                <a href="/estancia/remover/<%=estancia.CPF_propietario%>" class="btn btn-sm btn-danger">Remover</a>
-                                            </td>
-                                        </tr>
-                                    <% }); %>
-                              </tbody>
-                           </table>
-                        </div>
-                     </main>
+                            <div class="form-group row">
+                                <label for="nome_estancia" class="col-sm-2 col-form-label">Nome</label>
+                                <div class="col-sm-10">
+                                    <% if(estancia){ %>
+                                    <input type="text" class="form-control" name="nome_estancia" placeholder="Informe o nome da estância..."
+                                        value="<%=estancia.Nome_Estancia%>" charCounter" maxlength="155" required>
+                                    <% } else{ %>
+                                    <input type="text" class="form-control" name="nome_estancia" placeholder="Informe o nome do estancia..."
+                                        value="" charCounter" maxlength="155" required>
+                                    <% } %>
+                                </div>
+                            </div>
 
-                <!-- FIM DO CONTEUDO DA PAGINA -->
-                
-                <% include partials/footer.ejs %>
-            </div>
+                            <div class="form-group row">
+                                <label for="clientes_cpf_proprietario" class="col-sm-2 col-form-label">Clientes
+                                    Propietários</label>
+                                <div class="col-sm-10">
+                                    <select class="form-control" name="clientes_cpf_proprietario" name="clientes_cpf_proprietario">
+                                        <% clientes.forEach(function(cliente){ %>
+                                        <option value="<%= cliente.CPF %>">
+                                            <%= cliente.Nome %>
+                                        </option>
+                                        <% }); %>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label for="referencia_estancia" class="col-sm-2 col-form-label">Referência</label>
+                                <div class="col-sm-10">
+                                    <% if(estancia){ %>
+                                    <input type="text" class="form-control" name="referencia_estancia" placeholder="Informe a referência do local..."
+                                        value="<%=estancia.Referencia%>" charCounter" maxlength="155" required>
+                                    <% } else{ %>
+                                    <input type="text" class="form-control" name="referencia_estancia" placeholder="Informe a referência do local..."
+                                        value="" charCounter" maxlength="155" required>
+                                    <% } %>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <div class="col-12 d-flex justify-content-end">
+                                    <button class="btn btn-primary ml-2" type="submit" onclick="submitForm()">Salvar</button>
+                                    <button class="btn ml-2" type="reset">Limpar</button>
+                                </div>
+                            </div>
+                        </form>
+                        <!-- FIM DO FORMULARIO PARA ADD/UPDATE DADOS -->
+                    </div>
+
+                    <!-- INICIO DA LISTAGEM GERAL DOS DADOS-->
+                    <table class="table mt-10">
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Nome</th>
+                                <th>Referência</th>
+                                <th>Propietário</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% estancias.forEach(function(estancia){ %>
+                            <tr>
+                                <td>
+                                    <i class="fas fa-warehouse"></i>
+                                    <%= estancia.Codigo %>
+                                </td>
+                                <td>
+                                    <%= estancia.Nome_Estancia %>
+                                </td>
+                                <td>
+                                    <%= estancia.Referencia %>
+                                </td>
+                                <td>
+                                    <%= estancia.Nome %>
+                                </td>
+
+                                <td>
+                                    <a href="/estancias/editar/<%=estancia.Codigo%>" class="btn btn-sm btn-primary">Editar</a>
+                                    <a href="/estancias/remover/<%=estancia.Codigo%>" class="btn btn-sm btn-danger">Remover</a>
+                                </td>
+                            </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                    <!-- FIM DA LISTAGEM GERAL DOS DADOS -->
+
+                </div>
+            </main>
+            <hr />
+            <!-- FIM DO CONTEUDO CUSTOMIZADO DA PAGINA -->
+
+            <% include partials/footer.ejs %>
         </div>
-
-        <script>
-               
-                function submitForm() {
-                    document.contact-form.submit();
-                    document.contact-form.reset();
-                }
-            </script>
+    </div>
 </body>
+
 </html>

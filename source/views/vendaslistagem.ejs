@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+<% include partials/header.ejs %>
+<script>
+    function submitForm() {
+        form.submit();
+    }
+
+</script>
+
+<body>
+    <div id="root">
+        <div class="app">
+            <% include partials/menu.ejs %>
+
+            <!--- INICIO DO CONTEUDO CUSTOMIZADO DA PAGINA -->
+            <main class="content container-fluid">
+                <div class="p-3 mt-3">
+
+                    <div class="container">
+
+                        <!-- INICIO DO FORMULARIO PARA ADD/UPDATE DADOS -->
+                        <form action="<%=action%>" method="post">
+                            <div class="form-group row">
+                                <div class="col-10 d-flex justify-content-end">
+                                    <button class="btn btn-success ml-2" type="submit" onclick="submitForm()">
+                                        Pesquisar vendas
+                                    </button>
+                                    <button class="btn ml-2">
+                                        Limpar
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label for="codigo_venda" class="col-sm-4 col-form-label">Codigo</label>
+                                <div class="col-sm-6">
+                                    <input type="number" class="form-control" name="codigo_venda" id="codigo_venda"
+                                        value="" placeholder="Digite o Codigo da venda">
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label for="clientes" class="col-sm-4 col-form-label">Encontre pelo cliente</label>
+                                <div class="col-sm-6">
+                                    <select class="form-control" name="clientes" id="clientes">
+                                        <option value="">-</option>
+                                        <% clientes.forEach(function(cliente){ %>
+                                        <option value="<%= cliente.CPF %>">
+                                            <%= cliente.Nome %>
+                                        </option>
+                                        <% }); %>
+                                    </select>
+                                </div>
+
+                            </div>
+
+                            <div class="form-group row">
+                                <label for="atendentes" class="col-sm-4 col-form-label">Encontre pelo atendente</label>
+                                <div class="col-sm-6">
+                                    <select class="form-control" name="fornecedores" id="atendentes">
+                                        <option value="">-</option>
+                                        <% atendentes.forEach(function(atendente){ %>
+                                        <option value="<%= atendente.CPF%>">
+                                            <%= atendente.Nome %>
+                                        </option>
+                                        <% }); %>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label for="freteiros" class="col-sm-4 col-form-label">Encontre pelo freteiro</label>
+                                <div class="col-sm-6">
+                                    <select class="form-control" name="freteiros" id="freteiros">
+                                        <option value="">-</option>
+                                        <% freteiros.forEach(function(freteiro){ %>
+                                        <option value="<%= freteiro.CPF%>">
+                                            <%= freteiro.Nome %>
+                                        </option>
+                                        <% }); %>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label for="produtos" class="col-sm-4 col-form-label">Encontre pelo produto</label>
+                                <div class="col-sm-6">
+                                    <select class="form-control" name="produtos" id="produtos">
+                                        <option value="">-</option>
+                                        <% produtos.forEach(function(produto){ %>
+                                        <option value="<%= produto.Codigo%>">
+                                            <%= produto.Nome %>
+                                        </option>
+                                        <% }); %>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label for="fornecedores" class="col-sm-4 col-form-label">Encontre pelo fornecedor</label>
+                                <div class="col-sm-6">
+                                    <select class="form-control" name="fornecedores" id="fornecedores">
+                                        <option value="">-</option>
+                                        <% fornecedores.forEach(function(fornecedor){ %>
+                                        <option value="<%= fornecedor.ID%>">
+                                            <%=fornecedor.Nome %>
+                                        </option>
+                                        <% }); %>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label for="data_venda" class="col-sm-4 col-form-label">Data da venda</label>
+                                <div class="col-sm-6">
+                                    <input type="date" class="form-control" id="data_venda"  name="data_venda" value="" placeholder="Digite no formato dd-mm-yyyy">
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label for="qtde_venda" class="col-sm-4 col-form-label">Quantidade comprada</label>
+                                <div class="col-sm-6">
+                                    <input type="number" class="form-control" name="qtde_venda" value="" placeholder="Digite a quantidade comprada">
+                                </div>
+                            </div>
+
+                        </form>
+                        <!-- FIM DO FORMULARIO PARA ADD/UPDATE DADOS -->
+                    </div>
+                    <p></p>
+
+                    <!-- INICIO DA LISTAGEM GERAL DOS DADOS-->
+                    <table class="table mt-10">
+                        <thead>
+                            <tr>
+                                <th>Codigo de venda</th>
+                                <th>Data da venda</th>
+                                <th>Cliente</th>
+                                <th>Atendente</th>
+                                <th>Freteiro</th>
+                                <th>Produto</th>
+                                <th>Fornecedor</th>
+                                <th>Qtde pedida</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% vendas.forEach(function(venda){ %>
+                            <tr>
+                                <td>
+                                    <i class="fas fa-money-check-alt"></i>
+                                    <%= venda.Codigo %>
+                                </td>
+                                <td>
+                                    <%= venda.Data_Venda %>
+                                </td>
+                                <td>
+                                    <%= venda.Nome_Cliente %>
+                                </td>
+                                <td>
+                                    <%= venda.Nome_Atentente %>
+                                </td>
+                                <td>
+                                    <%= venda.Nome_Freteiro %>
+                                </td>
+                                <td>
+                                        <%= venda.Nome_Produto %>
+                                </td>
+                                <td>
+                                    <%= venda.Nome_Fornecedor %>
+                                </td>
+                                <td>
+                                    <%= venda.Qtde %>
+                                </td>
+                                <td>
+                                    <a href="/vendas/editar/<%= venda.Codigo %>" class="btn btn-sm btn-primary">Editar</a>
+                                    <a href="/vendas/remover/<%= venda.Codigo %>" class="btn btn-sm btn-danger">Remover</a>
+                                </td>
+                            </tr>
+                            <% }); %>
+                            
+                        </tbody>
+                    </table>
+                    <!-- FIM DA LISTAGEM GERAL DOS DADOS -->
+
+                </div>
+            </main>
+            <hr />
+            <!-- FIM DO CONTEUDO CUSTOMIZADO DA PAGINA -->
+
+            <% include partials/footer.ejs %>
+        </div>
+    </div>
+</body>
+
+</html>

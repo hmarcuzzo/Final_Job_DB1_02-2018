@@ -9,7 +9,8 @@ const url_list = '/categorias/';
 const dadosParaPagina = {
     subtitulo: subtitulo,
     titulo: titulo,
-    message: '',
+    message_erro: '',
+    message_sucesso: '',
     icone: icone,
     categorias: [],
     categoria: null,
@@ -19,15 +20,18 @@ const dadosParaPagina = {
 module.exports = {
     listarCategoria: (req, res) => {
         console.log("Executar açao de listar todos as categorias");
+
+        dadosParaPagina.action = url_add;
+        dadosParaPagina.message_sucesso = '';
+        dadosParaPagina.message_erro = '';
+
         let query = "SELECT * FROM Categoria";
-        db.query(query, (sql_erro, sql_resultado) => {
-            if (sql_erro){
-                dadosParaPagina.message = sql_erro;
+        db.query(query, function (erro, resultado) {
+            if (erro) {
+                var message = "Não foi possivel listar clientes. Erro:" + erro;
+                dadosParaPagina.message_erro = message;
             }
-            
-            dadosParaPagina.categorias = sql_resultado;
-            dadosParaPagina.action = url_add;
-            dadosParaPagina.message = '';
+            dadosParaPagina.categorias = resultado;
             dadosParaPagina.categoria = null;
             res.render('categorias.ejs', dadosParaPagina);
         });
@@ -35,104 +39,91 @@ module.exports = {
 
     adicionarCategoria: (req, res) => {
         console.log("Executar açao de adicionar nova categoria");
+
+        // receber as variaveis do template ejs (html)
         var message = '';
         var nome = req.body.nome_categoria;
         var descricao = req.body.descricao_categoria;
-        
-        //get data
+
+        //set Data
         var data = {
             Nome: nome,
             Descricao: descricao
         };
 
-        var insert = "INSERT INTO Categoria set ? "; 
-        db.query(insert, data, (err, result) => {            
-            if (err) {
-                message = "Não foi possivel adicionar a categoria";    
-                dadosParaPagina.message = message;
-                res.render('clientes.ejs', dadosParaPagina);            
-
+        var insert = "INSERT INTO Categoria set ? ";
+        db.query(insert, data, function (erro, resultado) {
+            if (erro) {
+                var message = "Não foi possivel adicionar a categoria";
+                dadosParaPagina.message_erro = message;
+                dadosParaPagina.action = url_add;
+                res.render('clientes.ejs', dadosParaPagina);
             }
-            
-            res.redirect(url_list);           
+            res.redirect(url_list);
         });
 
     },
 
     atualizarCategoria: (req, res) => {
         console.log("Executar açao de editar categoria");
+
+        // receber as variaveis do template ejs (html)
         let id = req.body.id_categoria;
         var message = '';
         var nome = req.body.nome_categoria;
         var descricao = req.body.descricao_categoria;
-        
-        //get data
+
+        //set data
         var data = {
             Nome: nome,
             Descricao: descricao
         };
-        // console.log(data, id);
-        // res.redirect(url);
-        
-        var insert = "UPDATE Categoria set ? WHERE ID = ? "; 
-        db.query(insert, [data, id], (err, result) => {            
-            if (err) {
-                console.log("XIiiiiiii");
-                message = "Não foi possivel atualizar a categoria";    
-                dadosParaPagina.message = message;
-                res.render('clientes.ejs', dadosParaPagina);            
 
+        var insert = "UPDATE Categoria set ? WHERE ID = ? ";
+        db.query(insert, [data, id], function (erro, resultado) {
+            if (erro) {
+                dadosParaPagina.message_erro = "Não foi possivel atualizar a categoria.Erro:" + erro;
+                dadosParaPagina.action = url_update;
+                res.render('categorias.ejs', dadosParaPagina);
             }
-            console.log("deu bom!");
-            dadosParaPagina.action = url_add;
-            dadosParaPagina.message = '';            
-            res.redirect(url_list);           
+            res.redirect(url_list);
         });
     },
 
-    detalharCategoria: (req, res) => {        
-        console.log("Executar açao de listar a categoria selecionada!!!");
+    detalharCategoria: (req, res) => {
+        console.log("Executar açao de listar a categoria ID = ", req.params.id);
         let id = req.params.id;
-        
-        var query = "SELECT * FROM Categoria WHERE ID = "+ id;
-        db.query(query, (err, resultado) => {
-            if (err) {
-                return res.status(500).send(err);
-            }            
+
+        var query = "SELECT * FROM Categoria WHERE ID = " + id;
+        db.query(query, function (erro, resultado) {
+            if (erro) {
+                dadosParaPagina.message_erro = "Não foi possivel encontrar categoria.Erro:" + erro;
+                dadosParaPagina.action = url_add;
+                res.render('categorias.ejs', dadosParaPagina);
+            }
             dadosParaPagina.categoria = resultado[0];
-            dadosParaPagina.action = url_update;       
-            // console.log(dadosParaPagina);
+            dadosParaPagina.action = url_update;
             res.render('categorias.ejs', dadosParaPagina);
         });
     },
-    
+
     removerCategoria: (req, res) => {
         /*
             Para remover a categoria é necessario
             1 - Remover a categoria do Produto
             2 - Remover a categoria
         */
-       let id = req.params.id;        
-       console.log("Executar açao de remover categoria por ID =", id);
+        console.log("Executar açao de remover categoria id=", req.params.id);
+        let id = req.params.id;
 
-     //TODO: Remover relacoes dos produtos e categorias
-    //    var select_produtos = "SELECT Codigo FROM produtos WHERE ID_Categoria =";
-    //    db.query(select_cliente, [cpf], function(err, resultado){
-    //        if(!err){
-    //            telefone = resultado[0];
-    //        }
-    //    });
-       
-       var delete_data = "DELETE FROM Categoria  WHERE ID = ?"; 
-       db.query(delete_data, [id], (err, result) => {            
-           if (err) {
-               message = "Não foi possivel remover a categoria";    
-               dadosParaPagina.message = message;               
-               res.render('categorias.ejs', dadosParaPagina);            
-
-           }
-           console.log("Apagado categoria");            
-           res.redirect(url_list);           
-       });
+        var delete_data = "DELETE FROM Categoria  WHERE ID = ?";
+        db.query(delete_data, [id], function (erro, resultado) {
+            if (erro) {
+                dadosParaPagina.message_erro = "Não foi possivel remover categoria.Erro:" + erro;
+                res.render('categorias.ejs', dadosParaPagina);
+            }
+            console.log("Apagado categoria");
+            res.redirect(url_list);
+        });
     }
 };

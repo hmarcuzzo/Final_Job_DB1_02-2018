@@ -5,16 +5,17 @@ const path = require('path');
 const app = express();
 
 const port = 8000; //porta padrão
-const {getTelaInicial} = require('./routes/index');
-const {listarClientes, adicionarCliente, atualizarCliente, detalharCliente, removerCliente, buscarCPF} = require('./routes/clientes');
-const {listarCategoria, adicionarCategoria, atualizarCategoria, detalharCategoria, removerCategoria} = require('./routes/categorias');
-const {listarFornecedor, adicionarFornecedor, atualizarFornecedor, detalharFornecedor, removerFornecedor} = require('./routes/fornecedores');
-const {listarEstancia, adicionarEstancia, atualizarEstancia, detalharEstancia, removerEstancia} = require('./routes/estancias');
-const {listarProduto, adicionarProduto, atualizarProduto, detalharProduto, removerProduto} = require('./routes/produtos');
-const {listarFuncionario, adicionarFuncionario, atualizarFuncionario, detalharFuncionario, removerFuncionario} = require('./routes/funcionarios');
+const { getTelaInicial } = require('./routes/index');
+const { listarClientes, adicionarCliente, atualizarCliente, detalharCliente, removerCliente, buscarCPF } = require('./routes/clientes');
+const { listarCategoria, adicionarCategoria, atualizarCategoria, detalharCategoria, removerCategoria } = require('./routes/categorias');
+const { listarFornecedor, adicionarFornecedor, atualizarFornecedor, detalharFornecedor, removerFornecedor } = require('./routes/fornecedores');
+const { listarEstancia, adicionarEstancia, atualizarEstancia, detalharEstancia, removerEstancia } = require('./routes/estancias');
+const { listarProduto, adicionarProduto, atualizarProduto, detalharProduto, removerProduto } = require('./routes/produtos');
+const { listarFuncionario, adicionarFuncionario, atualizarFuncionario, detalharFuncionario, removerFuncionario } = require('./routes/funcionarios');
+const { mostrarListagemVenda, pesquisarVenda, listarVenda, adicionarVenda, atualizarVenda, detalharVenda, removerVenda } = require('./routes/vendas');
 
 // connect to database
-const db = mysql.createConnection ({
+const db = mysql.createConnection({
     host: 'localhost',
     user: 'agropec.admin',
     password: 'admin',
@@ -68,9 +69,9 @@ app.get('/fornecedores/remover/:id', removerFornecedor);
 //CRUD Estancia
 app.get('/estancias', listarEstancia);
 app.post('/estancias/adicionar', adicionarEstancia);
-app.get('/estancias/editar/:cpf', detalharEstancia);
+app.get('/estancias/editar/:codigo', detalharEstancia);
 app.post('/estancias/editar/', atualizarEstancia);
-app.get('/estancias/remover/:cpf', removerEstancia);
+app.get('/estancias/remover/:codigo', removerEstancia);
 
 
 //CRUD Produtos
@@ -86,6 +87,16 @@ app.post('/funcionarios/adicionar', adicionarFuncionario);
 app.get('/funcionarios/editar/:cpf', detalharFuncionario);
 app.post('/funcionarios/editar/', atualizarFuncionario);
 app.get('/funcionarios/remover/:cpf', removerFuncionario);
+
+//CRUD Vendas
+app.get('/vendas', listarVenda);
+app.get('/vendas/pesquisar', mostrarListagemVenda);
+app.post('/vendas/pesquisar', pesquisarVenda);
+app.post('/vendas/adicionar', adicionarVenda);
+app.get('/vendas/editar/:codigo', atualizarVenda);
+app.post('/vendas/editar/', detalharVenda);
+app.get('/vendas/remover/:codigo', removerVenda);
+
 
 // set the app to listen on the port
 app.listen(port, () => {

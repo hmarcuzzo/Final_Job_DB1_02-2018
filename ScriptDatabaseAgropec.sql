@@ -1,7 +1,11 @@
+
+CREATE USER 'agropec.admin'@'localhost' IDENTIFIED BY 'admin'; 
+ALTER USER 'agropec.admin'@'localhost' IDENTIFIED WITH mysql_native_password BY 'admin'; 
+GRANT ALL PRIVILEGES ON Agropec.* TO 'agropec.admin'@'localhost';
+
 DROP DATABASE IF EXISTS Agropec;
 CREATE DATABASE IF NOT EXISTS Agropec;
 
-CREATE USER 'agropec.admin'@'localhost' IDENTIFIED BY 'admin'; 
 ALTER USER 'agropec.admin'@'localhost' IDENTIFIED WITH mysql_native_password BY 'admin'; 
 GRANT ALL PRIVILEGES ON Agropec.* TO 'agropec.admin'@'localhost';
 
@@ -27,20 +31,21 @@ CREATE TABLE Clientes(
 );
 
 CREATE TABLE Estancia(
-	Nome_Estancia VARCHAR(155) PRIMARY KEY,
-    CPF_propietario CHAR(11),
+    Codigo INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
+	Nome_Estancia VARCHAR(155),
+    CPF_propietario CHAR(11) NOT NULL,
 	Referencia VARCHAR(155),
     
     FOREIGN KEY (CPF_propietario) REFERENCES Clientes(CPF)
 );
 
  CREATE TABLE Telefones(
-	Numero VARCHAR(15) PRIMARY KEY
+	Numero VARCHAR(15) PRIMARY KEY NOT NULL
  );
  
  CREATE TABLE Telefone_Cliente(
-	Num_Telefone VARCHAR(15),
-    CPF_Cliente CHAR(11),
+	Num_Telefone VARCHAR(15) NOT NULL, 
+    CPF_Cliente CHAR(11) NOT NULL,
     
     PRIMARY KEY (Num_Telefone,CPF_Cliente),
     FOREIGN KEY (Num_Telefone) REFERENCES Telefones(Numero),
@@ -49,8 +54,8 @@ CREATE TABLE Estancia(
  
  CREATE TABLE Funcionarios(
 	CPF CHAR(11) PRIMARY KEY NOT NULL,
-    Nome VARCHAR(155),
-    Tipo VARCHAR(50),
+    Nome VARCHAR(155) NOT NULL,
+    Tipo VARCHAR(50) NOT NULL,
     CPF_Supervisor CHAR(11),
     FOREIGN KEY (CPF_Supervisor) REFERENCES Funcionarios(CPF)
  );
@@ -65,14 +70,14 @@ CREATE TABLE Supervisor(
 );
 
 CREATE TABLE Atendente(
-	CPF_Atendente CHAR(11) PRIMARY KEY,
+	CPF_Atendente CHAR(11) PRIMARY KEY NOT NULL,
     Nro_Vendas INTEGER,
     
     FOREIGN KEY (CPF_Atendente) REFERENCES Funcionarios(CPF)
 );
 
 CREATE TABLE Freteiro(
-	CPF_Freteiro CHAR(11) PRIMARY KEY,
+	CPF_Freteiro CHAR(11) PRIMARY KEY NOT NULL,
     Nro_Entregas INTEGER,
     
     FOREIGN KEY (CPF_Freteiro) REFERENCES Funcionarios(CPF)
@@ -80,21 +85,21 @@ CREATE TABLE Freteiro(
 
 CREATE TABLE Categoria(
 	ID INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
-    Nome VARCHAR(155),
+    Nome VARCHAR(155) NOT NULL,
     Descricao VARCHAR(255)
 );
 
 
 CREATE TABLE Fornecedor(
 		ID INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
-        Nome VARCHAR(155),
-        Tel VARCHAR(15)
+        Nome VARCHAR(155) NOT NULL,
+        Tel VARCHAR(15) 
 );
 
 
 CREATE TABLE Produtos(
 	Codigo INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
-    Nome VARCHAR(155),
+    Nome VARCHAR(155) NOT NULL,
     Preco REAL,
     Descricao VARCHAR(255),
     ID_categoria INTEGER NOT NULL,
@@ -110,9 +115,9 @@ CREATE TABLE Produtos(
 
 CREATE TABLE Vendas(
 	Codigo INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
-    CPF_cliente CHAR(11),
-    CPF_atendente CHAR(11),
-    CPF_freteiro CHAR(11),
+    CPF_cliente CHAR(11) NOT NULL,
+    CPF_atendente CHAR(11) NOT NULL,
+    CPF_freteiro CHAR(11) NOT NULL,
     Tel_cliente VARCHAR(15),
     
     FOREIGN KEY (CPF_cliente) REFERENCES Clientes(CPF),
@@ -122,10 +127,10 @@ CREATE TABLE Vendas(
 );
  
  CREATE TABLE QTDE_Vendida(
-	Cod_produto INTEGER,
-    Cod_venda INTEGER,
-    Dia_venda DATE,
-    Qtde INTEGER,
+	Cod_produto INTEGER NOT NULL,
+    Cod_venda INTEGER NOT NULL,
+    Dia_venda DATE NOT NULL,
+    Qtde INTEGER NOT NULL,
     
     PRIMARY KEY (Cod_produto,Cod_venda),
     FOREIGN KEY (Cod_produto) REFERENCES Produtos(Codigo),

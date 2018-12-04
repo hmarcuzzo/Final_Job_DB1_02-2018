@@ -1,118 +1,153 @@
 <!doctype html>
 <html lang="en">
-        <% include partials/header.ejs %>
+<% include partials/header.ejs %>
+<script>
+    function submitForm() {
+        form.submit();
+        form.reset();
+    }
+</script>
+
 <body>
-        <div id="root"> 
-            <div class="app">
-                <% include partials/menu.ejs %>
-               
-                <!--- INICIO DO CONTEUDO DA PAGINA -->
-                <main class="content container-fluid">
-                        <% if (message != '') { %>
-                            <p class="text-center text-danger"><%= message %></p>
-                        
-                            <% } %>
-                        <div class="p-3 mt-3">
+    <div id="root">
+        <div class="app">
+            <% include partials/menu.ejs %>
 
-                           <!-- FORMULARIO PARA ADD CLIENTES -->
-                           <form class="add-player-form" action="<%=action%>" method="post">
-                            <div class="form">
-                                <div class="row">
-                                    <div class="col-12 col-md-6">
-                                            <div class="form-group">
-                                                <label>CPF</label>
-                                                <% if(funcionario){ %>
-                                                    <input type="number" class="form-control" name="cpf_funcionario" placeholder="Informe o CPF do funcionário..."  
-                                                    value="<%=funcionario.CPF%>" data-ls-module="charCounter" maxlength="11">
-                                                <% } else{ %>
-                                                    <input type="number" class="form-control" name="cpf_funcionario" placeholder="Informe o CPF do funcionário..." value=""data-ls-module="charCounter" maxlength="11">
-                                                <% } %> 
-                                            </div>
-                                        </div>
-                                       <div class="col-12 col-md-6">
-                                          <div class="form-group">
-                                              <label>Nome</label>
-                                              <% if(funcionario){ %>
-                                              <input type="text" class="form-control" name="nome_funcionario" placeholder="Informe o nome do funcionário.." 
-                                              value="<%=funcionario.Nome%>" data-ls-module="charCounter" maxlength="155">
-                                              <% } else{ %>
-                                                <input type="text" class="form-control" name="nome_funcionario" placeholder="Informe o nome do funcionário.." 
-                                                value="" data-ls-module="charCounter" maxlength="155">
-                                              <% } %> 
-                                            </div>
-                                       </div>
-                                       <div class="col-12 col-md-6">
-                                            <div class="form-group "><label>Cargo </label> <select name="cargos_funcionario">
-                                            <option value="Supervisor">Supervisor</option>
-                                            <option value="Atendente">Atendente</option>
-                                            <option value="Freteiro">Freteiro</option>
-                                            </select></div>
-                                    </div>                    
-                                       <div class="col-12 col-md-6">
-                                        <div class="form-group">
-                                            <label>Supervisor</label>
-                                            <input type="text" class="form-control" name="supervisor_funcionario" placeholder="Informe o CPF do supervisor.." 
-                                            value="" data-ls-module="charCounter" maxlength="155">
-                                        </div>
-                                     </div>
-                                          
-                                    </div>
-                                    <hr>
-                                    <div class="row">
-                                       <div class="col-12 d-flex justify-content-end">
-                                            <button class="btn btn-success ml-2">Pesquisar</button>
-                                           <button class="btn btn-primary ml-2">Adicionar</button>
-                                           <button class="btn btn-danger ml-2">Cancelar</button>
-                                        </div>
-                                    </div>
-                                 </div>
-                            </form>
-
-                           <!-- LISTAGEM GERAL DE CLIENTES -->
-                           <table class="table mt-5">
-                              <thead>
-                                 <tr>
-                                    <th></th>
-                                    <th>CPF</th>
-                                    <th>Nome</th>
-                                    <th>Cargo</th>
-                                    <th>Supervisor</th>
-                                    <th>Qtd. Vendida/Entregue</th>
-                                    <th>Ações</th>
-                                 </tr>
-                              </thead>
-                              <tbody>
-                                    <% funcionarios.forEach(function(funcionario){ %>
-                                        <tr>                                            
-                                            <td><i class="fas fa-users"></i></td>
-                                            <td><%= funcionario.CPF %></td>
-                                            <td><%= funcionario.Nome %></td>
-                                            <td><%= funcionario.Tipo %></td>                                             
-                                            <td><%= funcionario.Supervisor %></td>
-                                            <td><%= funcionario.Qtde %></td>                                           
-                                            <td>
-                                                <a href="/funcionarios/editar/<%=funcionario.CPF%>" class="btn btn-sm btn-primary">Editar</a>
-                                                <a href="/funcionarios/remover/<%=funcionario.CPF%>" class="btn btn-sm btn-danger">Remover</a>
-                                            </td>
-                                        </tr>
-                                    <% }); %>
-                              </tbody>
-                           </table>
+            <!--- INICIO DO CONTEUDO CUSTOMIZADO DA PAGINA -->
+            <main class="content container-fluid">
+                <div class="p-3 mt-3">
+                    <div class="container">
+                        <!--- INICIO DA AREA RESERVADA PARA MENSAGENS -->
+                        <% if (message_erro) { %>
+                        <div class="alert alert-danger" role="alert">
+                            <%= message_erro %>
                         </div>
-                     </main>
+                        <% } %>
 
-                <!-- FIM DO CONTEUDO DA PAGINA -->
-                
-                <% include partials/footer.ejs %>
-            </div>
+                        <% if (message_sucesso) { %>
+                        <div class="alert alert-success" role="alert">
+                            <%= message_sucesso %>
+                        </div>
+                        <% } %>
+                        <!--- FIM DA AREA RESERVADA PARA MENSAGENS -->
+
+                        <!-- INICIO DO FORMULARIO PARA ADD/UPDATE DADOS -->
+                        <form action="<%=action%>" method="post">
+
+                            <div class="form-group row">
+                                <label for="cpf_funcionario" class="col-sm-2 col-form-label">CPF</label>
+                                <div class="col-sm-10">
+                                    <% if(funcionario){ %>
+                                    <input type="number" class="form-control" name="cpf_funcionario" placeholder="Informe o CPF do funcionário..."
+                                        value="<%=funcionario.CPF%>" data-ls-module="charCounter" maxlength="11" readonly required>
+                                    <% } else{ %>
+                                    <input type="number" class="form-control" name="cpf_funcionario" placeholder="Informe o CPF do funcionário..."
+                                        value="" data-ls-module="charCounter" maxlength="11" required>
+                                    <% } %>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label for="nome_funcionario" class="col-sm-2 col-form-label">Nome</label>
+                                <div class="col-sm-10">
+                                    <% if(funcionario){ %>
+                                    <input type="text" class="form-control" name="nome_funcionario" placeholder="Informe o nome do funcionário.."
+                                        value="<%=funcionario.Nome%>" data-ls-module="charCounter" maxlength="155" required>
+                                    <% } else{ %>
+                                    <input type="text" class="form-control" name="nome_funcionario" placeholder="Informe o nome do funcionário.."
+                                        value="" data-ls-module="charCounter" maxlength="155" required>
+                                    <% } %>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label for="cargos_funcionario" class="col-sm-2 col-form-label">Cargo</label>
+                                <div class="col-sm-10">
+                                    <select name="cargos_funcionario">
+                                        <option value="supervisor">Supervisor</option>
+                                        <option value="atendente">Atendente</option>
+                                        <option value="freteiro">Freteiro</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label for="supervisor_funcionario" class="col-sm-2 col-form-label">Supervisor</label>
+                                <div class="col-sm-10">
+                                    <select class="form-control" name="supervisor_funcionario">
+                                        <option value="">Ninguém</option>
+                                        <% supervisores.forEach(function(obj){ %>
+                                        <option value="<%= obj.CPF %>">
+                                            <%= obj.Nome %>
+                                        </option>
+                                        <% }); %>
+                                    </select>
+                                    <!--<input type="text" class="form-control" name="supervisor_funcionario" placeholder="Informe o CPF do supervisor.."
+                                        value="" data-ls-module="charCounter" maxlength="155"> -->
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <div class="col-12 d-flex justify-content-end">
+                                    <button class="btn btn-success ml-2">Pesquisar</button>
+                                    <button class="btn btn-primary ml-2" type="submit" onclick="submitForm()">Salvar</button>
+                                    <button class="btn ml-2" type="reset">Limpar</button>
+                                </div>
+                            </div>
+                        </form>
+                        <!-- FIM DO FORMULARIO PARA ADD/UPDATE DADOS -->
+                    </div>
+
+                    <!-- INICIO DA LISTAGEM GERAL DOS DADOS-->
+                    <table class="table mt-10">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>CPF</th>
+                                <th>Nome</th>
+                                <th>Cargo</th>
+                                <th>Supervisor</th>
+                                <th>Qtd. Vendida/Entregue</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% funcionarios.forEach(function(funcionario){ %>
+                            <tr>
+                                <td><i class="fas fa-user-cog"></i></td>
+                                <td>
+                                    <%= funcionario.CPF %>
+                                </td>
+                                <td>
+                                    <%= funcionario.Nome %>
+                                </td>
+                                <td>
+                                    <%= funcionario.Tipo %>
+                                </td>
+                                <td>
+                                    <%= funcionario.Supervisor %>
+                                </td>
+                                <td>
+                                    <%= funcionario.Qtde %>
+                                </td>
+                                <td>
+                                    <a href="/funcionarios/editar/<%=funcionario.CPF%>" class="btn btn-sm btn-primary">Editar</a>
+                                    <a href="/funcionarios/remover/<%=funcionario.CPF%>" class="btn btn-sm btn-danger">Remover</a>
+                                </td>
+                            </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                    <!-- FIM DA LISTAGEM GERAL DOS DADOS -->
+
+                </div>
+            </main>
+            <hr />
+            <!-- FIM DO CONTEUDO CUSTOMIZADO DA PAGINA -->
+
+            <% include partials/footer.ejs %>
         </div>
-
-        <script>
-               
-                function submitForm() {
-                    document.contact-form.submit();
-                    document.contact-form.reset();
-                }
-            </script>
+    </div>
 </body>
+
 </html>

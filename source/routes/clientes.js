@@ -8,7 +8,8 @@ const url_update = '/clientes/editar/'
 const dadosParaPagina = {
     subtitulo: subtitulo,
     titulo: titulo,
-    message: '',
+    message_erro: '',
+    message_sucesso: '',
     icone: icone,
     clientes: [],
     cliente: null,
@@ -17,44 +18,45 @@ const dadosParaPagina = {
 
 module.exports = {
     listarClientes: (req, res) => {
-        console.log("Executar açao de listar todos os usuarios");
+        console.log("Executar açao de listar todos os clientes");
 
-        var query_listar_clientes = " SELECT C.*, T.* "+ 
-                                    " FROM Clientes C, Telefones T, Telefone_Cliente TC " + 
-                                    " WHERE TC.CPF_Cliente = C.CPF AND TC.Num_Telefone = T.Numero;";
-        db.query(query_listar_clientes, function(sql_erro, sql_resultado){
-            if (sql_erro){
-                dadosParaPagina.message = sql_erro;
+        dadosParaPagina.action = url_add;
+        dadosParaPagina.message_sucesso = '';
+        dadosParaPagina.message_erro = '';
+
+        var query_listar_clientes = " SELECT C.*, T.* " +
+            " FROM Clientes C, Telefones T, Telefone_Cliente TC " +
+            " WHERE TC.CPF_Cliente = C.CPF AND TC.Num_Telefone = T.Numero;";
+        db.query(query_listar_clientes, function (erro, resultado) {
+            if (erro) {
+                var message = "Não foi possivel listar clientes. Erro:" + erro;
+                dadosParaPagina.message_erro = message;
             }
-            
-            dadosParaPagina.clientes = sql_resultado; //mostrar a lista geral de clientes
+
+            dadosParaPagina.clientes = resultado;
             dadosParaPagina.action = url_add;
             dadosParaPagina.cliente = null;
-            dadosParaPagina.message = '';
-            // console.log("Clientes para a tela=", dadosParaPagina);
             res.render('clientes.ejs', dadosParaPagina);
 
         });
     },
 
-
     adicionarCliente: (req, res) => {
-        console.log("Executar açao de adicionar novo usuario");
-        
+        console.log("Executar açao de adicionar novo cliente");
+
         // receber as variaveis do template ejs (html)
         var nome = req.body.nome_cliente;
         var cpf = req.body.cpf_cliente;
         var telefone_cliente = req.body.tel_cliente;
 
-        console.log("Adicionar os registros:", cpf, nome, telefone_cliente);
-
-        if(nome == null || nome == '' || cpf == null || cpf == ''){
-            dadosParaPagina.message = "Prencher os campos obrigatórios(cpf,nome)";
+        console.log("Adicionar cliente com os dados:", cpf, nome, telefone_cliente);
+        if (nome == null || nome == '' || cpf == null || cpf == '') {
+            dadosParaPagina.message_erro = "Prencher os campos obrigatórios(cpf,nome)";
             dadosParaPagina.action = url_add;
-            res.render('clientes.ejs', dadosParaPagina);            
+            res.render('clientes.ejs', dadosParaPagina);
         }
 
-        //get data
+        //set Data
         var data_cliente = {
             Nome: nome,
             CPF: cpf
@@ -68,92 +70,79 @@ module.exports = {
             Num_Telefone: telefone_cliente,
             CPF_Cliente: cpf
         };
-        
+
         /*
             Acoes a serem executadas no Banco de Dados
             1 - Cadastrar novo Cliente
             2 - Cadastrar telefone do novo Cliente
             3 - Cadastrar relacao de cliente com telefone
         */
-                
-        var insert_cliente = "INSERT INTO Clientes set ? "; 
-        db.query(insert_cliente, data_cliente); 
 
-        var insert_telefone = "INSERT INTO Telefones set ? "; 
+        var insert_cliente = "INSERT INTO Clientes set ? ";
+        db.query(insert_cliente, data_cliente);
+
+        var insert_telefone = "INSERT INTO Telefones set ? ";
         db.query(insert_telefone, data_telefone);
 
-        var insert_telefone_cliente = "INSERT INTO Telefone_Cliente set ? "; 
-        db.query(insert_telefone_cliente, data_telefone_cliente, (err, result) => {            
-            if (err) {
-                message = "Não foi possivel adicionar o cliente";    
-                res.render('clientes.ejs', {
-                    subtitulo: subtitulo,
-                    titulo: titulo,
-                    message: message,
-                    icone: icone,
-                    clientes: [],
-                    cliente: null,
-                });            
-
+        var insert_telefone_cliente = "INSERT INTO Telefone_Cliente set ? ";
+        db.query(insert_telefone_cliente, data_telefone_cliente, function (erro, resultado) {
+            if (erro) {
+                dadosParaPagina.message_erro = "Não foi possivel adicionar o cliente.Erro:" + erro;
+                dadosParaPagina.action = url_add;
+                res.render('clientes.ejs', dadosParaPagina);
             }
-            
-            res.redirect(url_list);           
+            res.redirect(url_list);
         });
 
     },
 
     atualizarCliente: (req, res) => {
-        console.log("Executar açao de editar usuario");
-        var message = '';
+        console.log("Executar açao de editar cliente");
+
+        // receber as variaveis do template ejs (html)
         var nome = req.body.nome_cliente;
         var cpf = req.body.cpf_cliente;
-        
-        //get data
+
+        //set data
         var data = {
-            nome: nome,
-            cpf: cpf
+            Nome: nome,
+            CPF: cpf
         };
-        
-        var insert = "UPDATE Clientes set ? WHERE cpf = ? "; 
-        db.query(insert, [data,cpf], (err, resultado) => {            
-            if (err) {
-                message = "Não foi possivel atualizar o cliente";   
-                dadosParaPagina.message = message;
+
+        var insert = "UPDATE Clientes set ? WHERE cpf = ? ";
+        db.query(insert, [data, cpf], function (erro, resultado) {
+            if (erro) {
+                dadosParaPagina.message_erro = "Não foi possivel atualizar o cliente.Erro:" + erro;
                 dadosParaPagina.action = url_update;
-
-                res.render('clientes.ejs', dadosParaPagina);            
-
+                res.render('clientes.ejs', dadosParaPagina);
             }
-            
-            console.log("Aehooooo Atualizou!!!");
-            res.redirect(url_list);           
+            res.redirect(url_list);
         });
     },
 
-    detalharCliente: (req, res) => {   
+    detalharCliente: (req, res) => {
         /*
             Para editar as informaçoes do Cliente
             é necessario buscar primeiro as informaçoes no banco
             e depois retornar para a pagina
         */
-        let cpf = req.params.cpf;        
-        var clientes = [];
-        console.log("Executar açao de editar  usuario CPF=", cpf);
+        console.log("Executar açao de editar cliente CPF=", req.params.cpf);
+        let cpf = req.params.cpf;
 
-        query = "SELECT C.*, T.* FROM Clientes C, Telefones T, Telefone_Cliente TC " + 
-        "WHERE TC.CPF_Cliente = C.CPF AND TC.Num_Telefone = T.Numero AND C.CPF = '"+cpf+"'";
-        db.query(query, (err, resultado) => {
-            if (err) {
-                return res.status(500).send(err);
-            }     
-            // console.log("Retornar os dados:", resultado);
+        query = "SELECT C.*, T.* FROM Clientes C, Telefones T, Telefone_Cliente TC " +
+            "WHERE TC.CPF_Cliente = C.CPF AND TC.Num_Telefone = T.Numero AND C.CPF = '" + cpf + "'";
+        db.query(query, function (erro, resultado) {
+            if (erro) {
+                dadosParaPagina.message_erro = "Não foi possivel encontrar o cliente.Erro:" + erro;
+                dadosParaPagina.action = url_add;
+                res.render('clientes.ejs', dadosParaPagina);
+            }
             dadosParaPagina.cliente = resultado[0];
-            dadosParaPagina.action = url_update;       
-            // console.log(dadosParaPagina);
+            dadosParaPagina.action = url_update;
             res.render('clientes.ejs', dadosParaPagina);
         });
     },
-    
+
     removerCliente: (req, res) => {
         /*
             Para remover um cliente é necessario
@@ -161,43 +150,54 @@ module.exports = {
             2 - remover o telefone do cliente
             3 - remover o cliente
         */
-        let cpf = req.params.cpf;        
-        var clientes = [];
-        var message = '';
+        console.log("Executar açao de remover cliente CPF=", req.params.cpf);
+        let cpf = req.params.cpf;
         var telefone = '';
-        console.log("Executar açao de remover  usuario CPF=", cpf);
 
+        var query_verifica_venda = "select count(*) as venda from vendas where CPF_cliente = ?";
+        db.query(query_verifica_venda, [cpf], function (erro, resultado){
+            if(resultado){
+                var venda = resultado[0].venda;
+                console.log("venda = ", venda);
+
+                if(parseInt(venda) > 0){
+                    dadosParaPagina.message_erro = "Esse cliente possui vendas e não pode ser apagado!";
+                    res.render('clientes.ejs', dadosParaPagina);
+                }
+            }
+        });
         var select_cliente = "SELECT Num_Telefone FROM Telefone_Cliente WHERE CPF_Cliente = ?";
-        db.query(select_cliente, [cpf], function(err, resultado){
-            if(!err){
+        db.query(select_cliente, [cpf], function (erro, resultado) {
+            if (!erro) {
                 telefone = resultado[0];
             }
         });
+        console.log("Selecionando Estancia Cliente");
+        var delete_estancia_cliente = "DELETE FROM Estancia WHERE CPF_propietario = ?";
+        db.query(delete_estancia_cliente, [cpf]);
         console.log("Selecionando Telefone Cliente");
-        var delete_telefone_cliente = "DELETE FROM Telefone_Cliente WHERE CPF_Cliente = ?"; 
-        db.query(delete_telefone_cliente, [cpf]); 
+        var delete_telefone_cliente = "DELETE FROM Telefone_Cliente WHERE CPF_Cliente = ?";
+        db.query(delete_telefone_cliente, [cpf]);
         console.log("Apagando Telefone Cliente");
-        var delete_telefone = "DELETE FROM Telefones WHERE Numero = ?"; 
+        var delete_telefone = "DELETE FROM Telefones WHERE Numero = ?";
         db.query(delete_telefone, [telefone]);
         console.log("Apagando Telefone");
-        var delete_cliente = "DELETE FROM Clientes  WHERE CPF = ?"; 
-        db.query(delete_cliente, [cpf], (err, result) => {            
-            if (err) {
-                message = "Não foi possivel remover o cliente";    
-                dadosParaPagina.message = message;
-                
-                res.render('clientes.ejs', dadosParaPagina);            
+        var delete_cliente = "DELETE FROM Clientes  WHERE CPF = ?";
+        db.query(delete_cliente, [cpf], function (erro, resultado) {
+            if (erro) {
+                dadosParaPagina.message_erro = "Não foi possivel remover o cliente.Erro:" + erro;
+                res.render('clientes.ejs', dadosParaPagina);
 
             }
-            console.log("Apagando Cliente");            
-            res.redirect(url_list);           
+            console.log("Apagando Cliente");
+            res.redirect(url_list);
         });
     },
 
     buscarCPF: (req, res) => {
         let cpf = req.params.cpf;
 
-        console.log("buscando usuario por CPF",cpf);
+        console.log("Buscando cliente por CPF", cpf);
 
         var select_cliente = "SELECT CPF FROM Clientes WHERE CPF = ?";
         var resultados = [];
